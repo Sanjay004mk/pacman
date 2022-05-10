@@ -12,7 +12,7 @@ project "pacman"
     targetdir ("bin/" .. outputdir)
     objdir ("bin-int/" .. outputdir)
 
-    files { "src/**" }
+    files { "src/**", "src/game/**" }
 
     includedirs "ext/include"
 
