@@ -1,0 +1,8 @@
+bin/
+bin-int/
+.git/
+.vs/
+pacman.sln
+premake5.exe
+src/pacman.vcxproj
+src/pacman.vcxproj.user
