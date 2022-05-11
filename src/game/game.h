@@ -2,6 +2,8 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 
+#include <chrono>
+
 #include "game_manager.h"
 
 struct Window
@@ -12,6 +14,8 @@ struct Window
 
 	Window(int32_t width, int32_t height, const char* title);
 	Window();
+	~Window();
+	void init();
 
 	void update();
 
@@ -33,5 +37,6 @@ private:
 	static Window* mWindow;
 	static GameManager* mManager;
 	static float delta;
-	static float lastTime;
+	static std::chrono::steady_clock::time_point cur_time;
+	static std::chrono::steady_clock::time_point last_time;
 };

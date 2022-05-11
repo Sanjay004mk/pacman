@@ -6,3 +6,4 @@ pacman.sln
 premake5.exe
 src/pacman.vcxproj
 src/pacman.vcxproj.user
+src/pacman.vcxproj.filters

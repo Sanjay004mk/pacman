@@ -1,24 +1,35 @@
 #include "game.h"
 #include "utils.h"
 
+void windowResizeCallback(GLFWwindow* window, int width, int height);
+
 Window::Window(int32_t width, int32_t height, const char* title)
 	: width(width), height(height), title(title)
 {
-	window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-	glfwMakeContextCurrent(window);
-	glfwSetWindowSizeLimits(window, 400, 400, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	init();
 }
 
 Window::Window()
 {
+	init();
+}
+
+Window::~Window()
+{
+	glfwDestroyWindow(window);
+}
+
+void Window::init()
+{
 	window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	glfwSetWindowSizeLimits(window, 400, 400, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSwapInterval(1);
+	glfwSetWindowSizeCallback(window, windowResizeCallback);
 }
 
 void Window::update()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
 	swapBuffers();
 	glfwPollEvents();
 }
@@ -26,7 +37,8 @@ void Window::update()
 Window* Game::mWindow;
 GameManager* Game::mManager;
 float Game::delta;
-float Game::lastTime;
+std::chrono::steady_clock::time_point Game::cur_time;
+std::chrono::steady_clock::time_point Game::last_time;
 
 void Game::Run()
 {
@@ -37,15 +49,16 @@ void Game::Run()
 
 void Game::init()
 {
-	ASSERT(glfwInit() == GLFW_TRUE, "failed to initialize glfw!");
+	ASSERT(glfwInit() == GLFW_TRUE, "[GLFW]: ERROR: failed to initialize glfw!");
 
 	mWindow = new Window();
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-	ASSERT(glewInit() == GLEW_OK, "failed to initialize glew!");
+	ASSERT(glewInit() == GLEW_OK, "[GLEW]: ERROR: failed to initialize glew!");
 
-	mManager = new GameManager();
-
+	mManager = new GameManager((float)mWindow->width / (float)mWindow->height);
+	mManager->setWindowPtr(mWindow);
+	glfwSetWindowUserPointer(mWindow->window, mManager);
 }
 
 void Game::cleanup()
@@ -57,16 +70,25 @@ void Game::cleanup()
 void Game::loop()
 {
 	delta = 0.0f;
-	lastTime = (float)glfwGetTime();
+	cur_time = last_time = std::chrono::high_resolution_clock::now();
 	while (!mWindow->shouldClose())
 	{
-		delta = (float)glfwGetTime() - lastTime;
-		lastTime = (float)glfwGetTime();
-		glClear(GL_COLOR_BUFFER_BIT);
+		cur_time = std::chrono::high_resolution_clock::now();
+		delta = std::chrono::duration<float>(cur_time - last_time).count();
+		last_time = std::chrono::high_resolution_clock::now();
+
 		mManager->render(delta);
 		mManager->update(delta);
-		glfwSwapBuffers(mWindow->window);
-		glfwPollEvents();
-		//mWindow->update();
+		mWindow->update();
 	}
+}
+
+void windowResizeCallback(GLFWwindow* window, int width, int height)
+{
+	GameManager* m = (GameManager*)glfwGetWindowUserPointer(window);
+	m->mWindow->width = width;
+	m->mWindow->height = height;
+	float aspectRatio = (float)width / (float)height;
+	glViewport(0, 0, width, height);
+	m->setMatrix(aspectRatio);
 }
