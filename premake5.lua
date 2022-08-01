@@ -27,6 +27,7 @@ project "pacman"
 
     filter "configurations:Debug"
         symbols "On"
+        defines "GAME_DEBUG"
 
     filter "configurations:Release"
         optimize "On"
