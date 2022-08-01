@@ -13,7 +13,7 @@ src/icon.ico
 src/icon.png
 src/icon.txt
 src/pacman.aps
-src/pacman.rs
+src/pacman.rc
 src/pacman.vcxproj
 src/pacman.vcxproj.user
 src/pacman.vcxproj.filters
