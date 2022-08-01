@@ -1,8 +1,13 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#include <Windows.h>
 #include "utils.h"
 
 void readShaders(const char* filepath, std::string& vertexShader, std::string& fragmentShader)
 {
 	std::ifstream file(filepath);
+	ERR(!file.fail(), "failed to load shader files!");
 	std::stringstream ss[2];
 	std::string line;
 	size_t index = 0;
@@ -20,7 +25,7 @@ void readShaders(const char* filepath, std::string& vertexShader, std::string& f
 			ss[index] << line << "\n";
 		}
 	}
-
+	file.close();
 	vertexShader = ss[0].str();
 	fragmentShader = ss[1].str();
 }
@@ -38,13 +43,35 @@ uint32_t createShader(GLenum shaderType, const char* shaderSource)
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
 		char* msg = new char[len];
 		glGetShaderInfoLog(shader, len, &len, msg);
-		printf("failed to compile");
+		printf("[OPENGL]: failed to compile");
 		shaderType == GL_VERTEX_SHADER ? printf(" vertex ") : printf(" fragment ");
 		printf("shader!\n");
-		printf(msg);
+		GL_LOG(msg);
 		delete[] msg;
-		__debugbreak();
 	}
 
 	return shader;
+}
+
+void dumpData(const void* data, int32_t size, const std::string& fileName)
+{
+	std::ofstream dump(fileName, std::ios::binary);
+	ASSERT(!dump.fail(), "failed to dump data!");
+	dump.write((const char*)data, size);
+	dump.close();
+}
+
+glm::vec2 signum(const glm::vec2& vector)
+{
+	return { sgn(vector.x), sgn(vector.y) };
+}
+
+void showConsoleWindow()
+{
+	::ShowWindow(::GetConsoleWindow(), SW_SHOW);
+}
+
+void hideConsoleWindow()
+{
+	::ShowWindow(::GetConsoleWindow(), SW_HIDE);
 }

@@ -28,6 +28,7 @@ class Game
 public:
 	static void Run();
 
+	static bool locked;
 private:
 	static void init();
 	static void cleanup();

@@ -19,7 +19,7 @@ project "pacman"
     libdirs "ext/lib"
 
     filter "system:windows"
-        links { "opengl32", "glfw3_mt", "glew32s" }
+        links { "opengl32", "glfw3_mt", "glew32s", "OpenAL32.lib", "EFX-Util.lib" }
         defines "GLEW_STATIC"
         cppdialect "C++17"
         staticruntime "On"
